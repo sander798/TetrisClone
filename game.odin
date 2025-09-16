@@ -2,6 +2,9 @@ package tetrisClone
 
 import "core:fmt"
 import "core:log"
+import "core:time"
+//import "core:math"
+//import "core:math/rand"
 import rl "vendor:raylib"
 
 TITLE :: "TetrisClone"
@@ -12,15 +15,19 @@ Shape :: struct {
     tiles: [4][4]rl.Color,
 }
 
-board: [10][20]rl.Color = {}   //Game board
+board: [10][20]rl.Color = {}    //Game board
 
-currentShape: [16][2]u8     //Currently controlled shape (vector positions for each block)
-currentShapeLength: u8      //Number of active vectors
+nextUpShapes: [4]Shape          //Upcoming shapes list
+
+currentShape: [16][2]u8         //Currently controlled shape (vector positions for each block)
+currentShapeLength: u8          //Number of active vectors
 
 score: u32
-level: u8
+level: u8 = 1
 
-
+BASE_MOVEMENT_TIME :: time.Second * 2  //Starting time in ns between shape drops at level 1
+LEVEL_MOVEMENT_MOD: f32 : 1.05      //Drop time modifier per level
+lastMovementTime: time.Time     //Time at which last drop occurred
 
 main :: proc() {
     context.logger = log.create_console_logger()
@@ -33,16 +40,27 @@ main :: proc() {
 
     rl.SetTargetFPS(60)
 
-    for i in 0..<len(board){
-        board[i][0] = rl.RED
-    }
+    //Fill next-up shape queue
+    /*for &s in nextUpShapes {
+        log.debug("Add new shape")
+    }*/
 
+    //Set first controlled shape
+    
 
-
+    //Set initial time
+    lastMovementTime = time.now()
+    
     for !rl.WindowShouldClose() {
+        //Get input
+        
 
+        //Check for downward movement
+        if time.diff(lastMovementTime, time.now()) > BASE_MOVEMENT_TIME * time.Duration(LEVEL_MOVEMENT_MOD * f32(level)) {
+            lastMovementTime = time.now()
+        }
 
-    //  Rendering
+        //*** Rendering ***
         rl.BeginDrawing()
 
         rl.ClearBackground(rl.BLACK)
