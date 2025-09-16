@@ -3,7 +3,6 @@ package tetrisClone
 import "core:fmt"
 import "core:log"
 import "core:time"
-//import "core:math"
 //import "core:math/rand"
 import rl "vendor:raylib"
 
@@ -14,6 +13,30 @@ debugMode := true
 Shape :: struct {
     tiles: [4][4]rl.Color,
 }
+
+/*
+templateShape := Shape {
+    tiles = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}
+}
+*/
+
+lineShape := Shape {
+    tiles = {{0, 0, 0, 0}, {0, 0, 0, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, rl.YELLOW}, {0, 0, 0, 0}},
+}
+
+cornerRightShape := Shape {
+    tiles = {{0, 0, 0, 0}, {rl.RED, rl.RED, rl.RED, 0}, {0, 0, rl.RED, 0}, {0, 0, 0, 0}},
+}
+
+cornerLeftShape := Shape {
+    tiles = {{0, 0, 0, 0}, {0, 0, rl.ORANGE, 0}, {rl.ORANGE, rl.ORANGE, rl.ORANGE, 0}, {0, 0, 0, 0}},
+}
+
+squareShape := Shape {
+    tiles = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+}
+
+shapes: []Shape = {lineShape, cornerRightShape, cornerLeftShape, squareShape}
 
 board: [10][20]rl.Color = {}    //Game board
 
@@ -26,7 +49,7 @@ score: u32
 level: u8 = 1
 
 BASE_MOVEMENT_TIME :: time.Second * 2  //Starting time in ns between shape drops at level 1
-LEVEL_MOVEMENT_MOD: f32 : 1.05      //Drop time modifier per level
+LEVEL_MOVEMENT_MOD: f32 : 1.05  //Drop time modifier per level
 lastMovementTime: time.Time     //Time at which last drop occurred
 
 main :: proc() {
