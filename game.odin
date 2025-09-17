@@ -57,6 +57,7 @@ LEVEL_MOVEMENT_MOD: f64 : 0.05  //Drop time modifier per level
 lastMovementTime: time.Time     //Time at which last drop occurred
 
 Direction :: enum {
+    NONE,
     UP,
     DOWN,
     LEFT,
@@ -77,6 +78,7 @@ moveShape :: proc(dir: Direction) -> bool {
     //Move shape if possible, else restore old shape points
     for p in 0..<currentShapeLength {
         switch dir {
+        case .NONE:
         case .UP:
             currentShapePoints[p].y -= 1
         case .DOWN:
@@ -130,6 +132,10 @@ spawnShape :: proc() {
     }
 }
 
+rotateShape :: proc() {
+
+}
+
 main :: proc() {
     context.logger = log.create_console_logger()
     defer log.destroy_console_logger(context.logger)
@@ -154,7 +160,19 @@ main :: proc() {
     
     for !rl.WindowShouldClose() {
         //Get input
+        if rl.IsKeyPressed(rl.KeyboardKey.DOWN) {
+            moveShape(.DOWN)
+        } else if rl.IsKeyPressed(rl.KeyboardKey.LEFT) {
+            moveShape(.LEFT)
+        } else if rl.IsKeyPressed(rl.KeyboardKey.RIGHT) {
+            moveShape(.RIGHT)
+        } else if rl.IsKeyPressed(rl.KeyboardKey.SPACE) { //Drop shape
+            for i in 0..<20 do moveShape(.DOWN)
+        }
         
+        if rl.IsKeyPressed(rl.KeyboardKey.LEFT_SHIFT) { //Rotate shape
+            rotateShape()
+        }
 
         //Check for downward movement
         if time.diff(lastMovementTime, time.now()) > time.Duration(BASE_MOVEMENT_TIME * (1 - (LEVEL_MOVEMENT_MOD * f64(level)))) {
@@ -175,6 +193,9 @@ main :: proc() {
         rl.DrawRectangleLinesEx({396, 96, 308, 608}, 4, rl.GRAY)
         rl.DrawText(rl.TextFormat("Level: %d", level), 100, 100, 20, rl.WHITE)
         rl.DrawText(rl.TextFormat("Score: %d", score), 100, 140, 20, rl.WHITE)
+
+        //Shape queue
+        
 
         //Blocks
         for x in 0..<len(board) {
