@@ -36,7 +36,7 @@ squareShape := Shape {
     tiles = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
 }
 
-shapes: []Shape = {lineShape, cornerRightShape, cornerLeftShape, squareShape}
+shapes: []Shape = {/*lineShape, cornerRightShape, cornerLeftShape, */squareShape}
 
 board: [10][20]rl.Color = {}    //Game board
 
@@ -48,9 +48,14 @@ currentShapeLength: u8          //Number of active vectors
 
 oldPoints: [16][2]u8            //Temporary storage for current shape points
 blockColours: [16]rl.Color      //Temporary storage for current shape block colours
+rowsRemoved: u32                 //Temporary count of rows removed in a scoring check
 
 score: u32
-level: u8 = 16
+level: u32 = 1
+gameOver: bool
+
+BASE_ROW_SCORE: u32 : 10
+BASE_LEVEL_SCORE: u32 : 100 
 
 BASE_MOVEMENT_TIME :: f64(time.Second * 2)  //Starting time in ns between shape drops at level 1
 LEVEL_MOVEMENT_MOD: f64 : 0.05  //Drop time modifier per level
@@ -121,6 +126,12 @@ spawnShape :: proc() {
         for y in 0..<len(currentShapeType.tiles[0]) {
             //Skip blank spaces
             if currentShapeType.tiles[x][y] != 0 {
+                //Check if there is no room to spawn
+                if board[3 + x][y] != 0 {
+                    gameOver = true
+                    return
+                }
+
                 //Add this block to the board
                 board[3 + x][y] = currentShapeType.tiles[x][y]
 
@@ -142,7 +153,7 @@ main :: proc() {
 
     fmt.println("****", TITLE, "****")
 
-    rl.InitWindow(1280, 720, TITLE)
+    rl.InitWindow(720, 720, TITLE)
     defer rl.CloseWindow()
 
     rl.SetTargetFPS(60)
@@ -155,32 +166,64 @@ main :: proc() {
     //Set first controlled shape
     spawnShape()
 
+    gameOver = false
+
     //Set initial time
     lastMovementTime = time.now()
     
     for !rl.WindowShouldClose() {
-        //Get input
-        if rl.IsKeyPressed(rl.KeyboardKey.DOWN) {
-            moveShape(.DOWN)
-        } else if rl.IsKeyPressed(rl.KeyboardKey.LEFT) {
-            moveShape(.LEFT)
-        } else if rl.IsKeyPressed(rl.KeyboardKey.RIGHT) {
-            moveShape(.RIGHT)
-        } else if rl.IsKeyPressed(rl.KeyboardKey.SPACE) { //Drop shape
-            for i in 0..<20 do moveShape(.DOWN)
-        }
-        
-        if rl.IsKeyPressed(rl.KeyboardKey.LEFT_SHIFT) { //Rotate shape
-            rotateShape()
-        }
+        if !gameOver {
+            //Get input
+            if rl.IsKeyPressed(rl.KeyboardKey.DOWN) {
+                moveShape(.DOWN)
+            } else if rl.IsKeyPressed(rl.KeyboardKey.LEFT) {
+                moveShape(.LEFT)
+            } else if rl.IsKeyPressed(rl.KeyboardKey.RIGHT) {
+                moveShape(.RIGHT)
+            } else if rl.IsKeyPressed(rl.KeyboardKey.SPACE) { //Drop shape
+                for i in 0..<20 do moveShape(.DOWN)
+                lastMovementTime._nsec -= 10000000000
+            }
+            
+            if rl.IsKeyPressed(rl.KeyboardKey.LEFT_SHIFT) { //Rotate shape
+                rotateShape()
+            }
 
-        //Check for downward movement
-        if time.diff(lastMovementTime, time.now()) > time.Duration(BASE_MOVEMENT_TIME * (1 - (LEVEL_MOVEMENT_MOD * f64(level)))) {
-            lastMovementTime = time.now()
+            //Check for downward movement
+            if time.diff(lastMovementTime, time.now()) > time.Duration(BASE_MOVEMENT_TIME * (1 - (LEVEL_MOVEMENT_MOD * f64(level)))) {
+                lastMovementTime = time.now()
 
-            //If the shape cannot move down, let go of it and spawn a new shape at the top
-            if !moveShape(.DOWN) do spawnShape()
-        }
+                //If the shape cannot move down, let go of it and spawn a new shape at the top
+                if !moveShape(.DOWN) {
+                    //Score & remove complete rows
+                    rowsRemoved = 0
+
+                    loop: for y: u8 = len(board[0]) - 1; y > 0; y -= 1 {
+                        //Check if row is full
+                        for x in 0..<len(board) {
+                            if board[x][y] == 0 do continue loop
+                        }
+
+                        //Move everything above down one row
+                        for row: u8 = y; row > 0; row -= 1 {
+                            for col in 0..<len(board) {
+                                board[col][row] = board[col][row - 1]
+                            }
+                        }
+
+                        rowsRemoved += 1
+
+                        y += 1 //Redo this line's check in case of multiple rows needing removal
+                    }
+
+                    score += BASE_ROW_SCORE * rowsRemoved
+
+                    if score >= BASE_LEVEL_SCORE * level do level += 1
+
+                    spawnShape()
+                }
+            }     
+        }   
 
         //*** Rendering ***
         rl.BeginDrawing()
@@ -193,6 +236,7 @@ main :: proc() {
         rl.DrawRectangleLinesEx({396, 96, 308, 608}, 4, rl.GRAY)
         rl.DrawText(rl.TextFormat("Level: %d", level), 100, 100, 20, rl.WHITE)
         rl.DrawText(rl.TextFormat("Score: %d", score), 100, 140, 20, rl.WHITE)
+        if gameOver do rl.DrawText("GAME OVER", 100, 180, 30, rl.YELLOW)
 
         //Shape queue
         
