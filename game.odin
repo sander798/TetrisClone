@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 
 TITLE :: "TetrisClone"
 
-debugMode := true
+debugMode := false
 
 Shape :: struct {
     tiles1: [4][4]rl.Color,
@@ -55,13 +55,20 @@ squareShape := Shape {
 }
 
 zedShape := Shape {
-    tiles1 = {{rl.PURPLE, rl.PURPLE, 0, 0}, {0, rl.PURPLE, 0, 0}, {0, rl.PURPLE, rl.PURPLE, 0}, {0, 0, 0, 0}},
-    tiles2 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
-    tiles3 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
-    tiles4 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles1 = {{0, rl.PURPLE, 0, 0}, {rl.PURPLE, rl.PURPLE, 0, 0}, {rl.PURPLE, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles2 = {{0, 0, 0, 0}, {rl.PURPLE, rl.PURPLE, 0, 0}, {0, rl.PURPLE, rl.PURPLE, 0}, {0, 0, 0, 0}},
+    tiles3 = {{0, rl.PURPLE, 0, 0}, {rl.PURPLE, rl.PURPLE, 0, 0}, {rl.PURPLE, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles4 = {{0, 0, 0, 0}, {rl.PURPLE, rl.PURPLE, 0, 0}, {0, rl.PURPLE, rl.PURPLE, 0}, {0, 0, 0, 0}},
 }
 
-shapes: []Shape = {lineShape, cornerRightShape, cornerLeftShape, squareShape}
+bigZedShape := Shape {
+    tiles1 = {{rl.DARKPURPLE, rl.DARKPURPLE, 0, 0}, {0, rl.DARKPURPLE, 0, 0}, {0, rl.DARKPURPLE, rl.DARKPURPLE, 0}, {0, 0, 0, 0}},
+    tiles2 = {{0, 0, rl.DARKPURPLE, 0}, {rl.DARKPURPLE, rl.DARKPURPLE, rl.DARKPURPLE, 0}, {rl.DARKPURPLE, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles3 = {{rl.DARKPURPLE, rl.DARKPURPLE, 0, 0}, {0, rl.DARKPURPLE, 0, 0}, {0, rl.DARKPURPLE, rl.DARKPURPLE, 0}, {0, 0, 0, 0}},
+    tiles4 = {{0, 0, rl.DARKPURPLE, 0}, {rl.DARKPURPLE, rl.DARKPURPLE, rl.DARKPURPLE, 0}, {rl.DARKPURPLE, 0, 0, 0}, {0, 0, 0, 0}},
+}
+
+shapes: []Shape = {lineShape, cornerRightShape, cornerLeftShape, squareShape, zedShape, bigZedShape}
 
 board: [10][20]rl.Color = {}    //Game board
 
@@ -81,8 +88,8 @@ score: u32
 level: u32 = 1
 gameOver := false
 
-BASE_ROW_SCORE: u32 : 10
-BASE_LEVEL_SCORE: u32 : 100 
+BASE_ROW_SCORE: u32 : 1
+BASE_LEVEL_SCORE: u32 : 10
 
 BASE_MOVEMENT_TIME :: f64(time.Second * 2)  //Starting time in ns between shape drops at level 1
 LEVEL_MOVEMENT_MOD: f64 : 0.10  //Drop time modifier per level
@@ -157,11 +164,11 @@ spawnShape :: proc() {
     //Pop next queue shape and add a new one to the start of the queue
     currentShapeType = nextUpShapes[0]
 
-    for i in 1..<len(nextUpShapes) {
-        nextUpShapes[i - 1] = nextUpShapes[i]
+    for i in 0..<len(nextUpShapes) - 1 {
+        nextUpShapes[i] = nextUpShapes[i + 1]
     }
 
-    nextUpShapes[len(nextUpShapes) - 1] = shapes[rand.int_max(len(shapes))]
+    nextUpShapes[3] = shapes[rand.int_max(len(shapes))]
 
     //Add the new shape to the game
     currentShapeLength = 0
@@ -359,7 +366,15 @@ main :: proc() {
         if gameOver do rl.DrawText("GAME OVER", 10, 180, 30, rl.YELLOW)
 
         //Shape queue
-        
+        rl.DrawRectangleLinesEx({410, 4, 88, 88}, 2, rl.GRAY)
+
+        for s in 0..<len(nextUpShapes) {
+            for x in 0..<len(nextUpShapes[s].tiles1) {
+                for y in 0..<len(nextUpShapes[s].tiles1[0]){
+                    rl.DrawRectangle(i32(414 - (s * 100) + (x * 20)), i32(8 + (y * 20)), 20, 20, nextUpShapes[s].tiles1[x][y])
+                }
+            }
+        }
 
         //Blocks
         for x in 0..<len(board) {
