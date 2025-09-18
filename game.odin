@@ -11,32 +11,57 @@ TITLE :: "TetrisClone"
 debugMode := true
 
 Shape :: struct {
-    tiles: [4][4]rl.Color,
+    tiles1: [4][4]rl.Color,
+    tiles2: [4][4]rl.Color,
+    tiles3: [4][4]rl.Color,
+    tiles4: [4][4]rl.Color,
 }
 
 /*
 templateShape := Shape {
-    tiles = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}
+    tiles1 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles2 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles3 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles4 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},
 }
 */
 
 lineShape := Shape {
-    tiles = {{0, 0, 0, 0}, {0, 0, 0, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, rl.YELLOW}, {0, 0, 0, 0}},
+    tiles1 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {rl.GREEN, rl.GREEN, rl.GREEN, rl.GREEN}, {0, 0, 0, 0}},
+    tiles2 = {{rl.GREEN, 0, 0, 0}, {rl.GREEN, 0, 0, 0}, {rl.GREEN, 0, 0, 0}, {rl.GREEN, 0, 0, 0}},
+    tiles3 = {{0, 0, 0, 0}, {0, 0, 0, 0}, {rl.GREEN, rl.GREEN, rl.GREEN, rl.GREEN}, {0, 0, 0, 0}},
+    tiles4 = {{rl.GREEN, 0, 0, 0}, {rl.GREEN, 0, 0, 0}, {rl.GREEN, 0, 0, 0}, {rl.GREEN, 0, 0, 0}},
 }
 
 cornerRightShape := Shape {
-    tiles = {{0, 0, 0, 0}, {rl.RED, rl.RED, rl.RED, 0}, {0, 0, rl.RED, 0}, {0, 0, 0, 0}},
+    tiles1 = {{0, 0, 0, 0}, {rl.RED, rl.RED, rl.RED, 0}, {0, 0, rl.RED, 0}, {0, 0, 0, 0}},
+    tiles2 = {{rl.RED, rl.RED, 0, 0}, {rl.RED, 0, 0, 0}, {rl.RED, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles3 = {{0, 0, 0, 0}, {0, rl.RED, 0, 0}, {0, rl.RED, rl.RED, rl.RED}, {0, 0, 0, 0}},
+    tiles4 = {{0, rl.RED, 0, 0}, {0, rl.RED, 0, 0}, {rl.RED, rl.RED, 0, 0}, {0, 0, 0, 0}},
 }
 
 cornerLeftShape := Shape {
-    tiles = {{0, 0, 0, 0}, {0, 0, rl.ORANGE, 0}, {rl.ORANGE, rl.ORANGE, rl.ORANGE, 0}, {0, 0, 0, 0}},
+    tiles1 = {{0, 0, 0, 0}, {0, 0, rl.ORANGE, 0}, {rl.ORANGE, rl.ORANGE, rl.ORANGE, 0}, {0, 0, 0, 0}},
+    tiles2 = {{rl.ORANGE, rl.ORANGE, 0, 0}, {0, rl.ORANGE, 0, 0}, {0, rl.ORANGE, 0, 0}, {0, 0, 0, 0}},
+    tiles3 = {{0, 0, 0, 0}, {rl.ORANGE, rl.ORANGE, rl.ORANGE, 0}, {rl.ORANGE, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles4 = {{rl.ORANGE, 0, 0, 0}, {rl.ORANGE, 0, 0, 0}, {rl.ORANGE, rl.ORANGE, 0, 0}, {0, 0, 0, 0}},
 }
 
 squareShape := Shape {
-    tiles = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles1 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles2 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles3 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles4 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
 }
 
-shapes: []Shape = {/*lineShape, cornerRightShape, cornerLeftShape, */squareShape}
+zedShape := Shape {
+    tiles1 = {{rl.PURPLE, rl.PURPLE, 0, 0}, {0, rl.PURPLE, 0, 0}, {0, rl.PURPLE, rl.PURPLE, 0}, {0, 0, 0, 0}},
+    tiles2 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles3 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+    tiles4 = {{0, 0, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {rl.BLUE, rl.BLUE, 0, 0}, {0, 0, 0, 0}},
+}
+
+shapes: []Shape = {lineShape, cornerRightShape, cornerLeftShape, squareShape}
 
 board: [10][20]rl.Color = {}    //Game board
 
@@ -45,24 +70,25 @@ nextUpShapes: [4]Shape          //Upcoming shapes list
 currentShapeType: Shape
 currentShapePoints: [16][2]u8   //Currently controlled shape (vector positions for each block)
 currentShapeLength: u8          //Number of active vectors
+currentShapeX, currentShapeY: int//Current relative position of the current shape
+currentShapeRotation: u8
 
 oldPoints: [16][2]u8            //Temporary storage for current shape points
 blockColours: [16]rl.Color      //Temporary storage for current shape block colours
-rowsRemoved: u32                 //Temporary count of rows removed in a scoring check
+rowsRemoved: u32                //Temporary count of rows removed in a scoring check
 
 score: u32
 level: u32 = 1
-gameOver: bool
+gameOver := false
 
 BASE_ROW_SCORE: u32 : 10
 BASE_LEVEL_SCORE: u32 : 100 
 
 BASE_MOVEMENT_TIME :: f64(time.Second * 2)  //Starting time in ns between shape drops at level 1
-LEVEL_MOVEMENT_MOD: f64 : 0.05  //Drop time modifier per level
+LEVEL_MOVEMENT_MOD: f64 : 0.10  //Drop time modifier per level
 lastMovementTime: time.Time     //Time at which last drop occurred
 
 Direction :: enum {
-    NONE,
     UP,
     DOWN,
     LEFT,
@@ -73,6 +99,7 @@ Direction :: enum {
 moveShape :: proc(dir: Direction) -> bool {
     //Remove current shape from the board to simplify collision
     oldPoints = currentShapePoints
+    tempX, tempY := currentShapeX, currentShapeY
 
     for p in 0..<currentShapeLength {
         blockColours[p] = board[currentShapePoints[p].x][currentShapePoints[p].y]
@@ -80,10 +107,26 @@ moveShape :: proc(dir: Direction) -> bool {
         board[currentShapePoints[p].x][currentShapePoints[p].y] = 0
     }
 
+    switch dir {
+    case .UP:
+        currentShapeY -= 1
+    case .DOWN:
+        currentShapeY += 1
+    case .LEFT:
+        currentShapeX -= 1
+    case .RIGHT:
+        currentShapeX += 1
+    }
+
+    //Ensure coords do not result in out-of-bounds when rotating
+    if currentShapeX < 0 do currentShapeX = 0
+    if currentShapeX > 6 do currentShapeX = 6
+    if currentShapeY < 0 do currentShapeY = 0
+    if currentShapeY > 16 do currentShapeY = 16
+
     //Move shape if possible, else restore old shape points
     for p in 0..<currentShapeLength {
         switch dir {
-        case .NONE:
         case .UP:
             currentShapePoints[p].y -= 1
         case .DOWN:
@@ -96,6 +139,7 @@ moveShape :: proc(dir: Direction) -> bool {
 
         if currentShapePoints[p].x < 0 || currentShapePoints[p].x > 9 || currentShapePoints[p].y < 0 || currentShapePoints[p].y > 19 || board[currentShapePoints[p].x][currentShapePoints[p].y] != 0 {
             currentShapePoints = oldPoints
+            currentShapeX, currentShapeY = tempX, tempY
             
             break
         }
@@ -122,10 +166,10 @@ spawnShape :: proc() {
     //Add the new shape to the game
     currentShapeLength = 0
 
-    for x in 0..<len(currentShapeType.tiles) {
-        for y in 0..<len(currentShapeType.tiles[0]) {
+    for x in 0..<len(currentShapeType.tiles1) {
+        for y in 0..<len(currentShapeType.tiles1[0]) {
             //Skip blank spaces
-            if currentShapeType.tiles[x][y] != 0 {
+            if currentShapeType.tiles1[x][y] != 0 {
                 //Check if there is no room to spawn
                 if board[3 + x][y] != 0 {
                     gameOver = true
@@ -133,7 +177,7 @@ spawnShape :: proc() {
                 }
 
                 //Add this block to the board
-                board[3 + x][y] = currentShapeType.tiles[x][y]
+                board[3 + x][y] = currentShapeType.tiles1[x][y]
 
                 //Add block to currently controlled shape
                 currentShapePoints[currentShapeLength] = {u8(3 + x), u8(y)}
@@ -141,10 +185,88 @@ spawnShape :: proc() {
             }
         }
     }
+
+    currentShapeX, currentShapeY = 3, 0
+    currentShapeRotation = 0
 }
 
-rotateShape :: proc() {
+//Rotates shape in desired direction, returns whether it was possible
+rotateShape :: proc(clockwise: bool) -> bool {
+    //Get new rotated form
+    tempRotation := currentShapeRotation
+    newForm: ^[4][4]rl.Color
 
+    if clockwise {
+        currentShapeRotation += 1
+
+        if currentShapeRotation > 3 do currentShapeRotation = 0
+    } else {
+        currentShapeRotation -= 1
+
+        if currentShapeRotation < 0 do currentShapeRotation = 3
+    }
+
+    switch currentShapeRotation {
+        case 0:
+            newForm = &currentShapeType.tiles1
+        case 1:
+            newForm = &currentShapeType.tiles2
+        case 2:
+            newForm = &currentShapeType.tiles3
+        case 3:
+            newForm = &currentShapeType.tiles4
+    }
+
+    //Remove old shape
+    for p in 0..<currentShapeLength {
+        board[currentShapePoints[p].x][currentShapePoints[p].y] = 0
+    }
+
+    //Check if the new form can be added to the board
+    outer: for x in 0..<len(currentShapeType.tiles1) {
+        for y in 0..<len(currentShapeType.tiles1[0]) {
+            //Skip blank spaces
+            if newForm^[x][y] != 0 {
+                //If there is no room to spawn, set the shape back to previous values
+                if board[currentShapeX + x][currentShapeY + y] != 0 {
+                    //TODO: force check at different coords
+                    currentShapeRotation = tempRotation
+                    
+                    switch currentShapeRotation {
+                    case 0:
+                        newForm = &currentShapeType.tiles1
+                    case 1:
+                        newForm = &currentShapeType.tiles2
+                    case 2:
+                        newForm = &currentShapeType.tiles3
+                    case 3:
+                        newForm = &currentShapeType.tiles4
+                    }
+
+                    break outer
+                }
+            }
+        }
+    }
+
+    //Add new shape form to the board
+    currentShapeLength = 0
+
+    for x in 0..<len(currentShapeType.tiles1) {
+        for y in 0..<len(currentShapeType.tiles1[0]) {
+            //Skip blank spaces
+            if newForm^[x][y] != 0 {
+                //Add this block to the board
+                board[currentShapeX + x][currentShapeY + y] = newForm^[x][y]
+
+                //Add block to currently controlled shape
+                currentShapePoints[currentShapeLength] = {u8(currentShapeX + x), u8(currentShapeY + y)}
+                currentShapeLength += 1
+            }
+        }
+    }
+
+    return true
 }
 
 main :: proc() {
@@ -166,8 +288,6 @@ main :: proc() {
     //Set first controlled shape
     spawnShape()
 
-    gameOver = false
-
     //Set initial time
     lastMovementTime = time.now()
     
@@ -186,7 +306,7 @@ main :: proc() {
             }
             
             if rl.IsKeyPressed(rl.KeyboardKey.LEFT_SHIFT) { //Rotate shape
-                rotateShape()
+                rotateShape(true)
             }
 
             //Check for downward movement
@@ -233,10 +353,10 @@ main :: proc() {
         //rl.DrawText("Hello World!", 100, 100, 20, rl.RED)
 
         //Board and stats
-        rl.DrawRectangleLinesEx({396, 96, 308, 608}, 4, rl.GRAY)
-        rl.DrawText(rl.TextFormat("Level: %d", level), 100, 100, 20, rl.WHITE)
-        rl.DrawText(rl.TextFormat("Score: %d", score), 100, 140, 20, rl.WHITE)
-        if gameOver do rl.DrawText("GAME OVER", 100, 180, 30, rl.YELLOW)
+        rl.DrawRectangleLinesEx({296, 96, 308, 608}, 4, rl.GRAY)
+        rl.DrawText(rl.TextFormat("Level: %d", level), 10, 100, 20, rl.WHITE)
+        rl.DrawText(rl.TextFormat("Score: %d", score), 10, 140, 20, rl.WHITE)
+        if gameOver do rl.DrawText("GAME OVER", 10, 180, 30, rl.YELLOW)
 
         //Shape queue
         
@@ -244,11 +364,14 @@ main :: proc() {
         //Blocks
         for x in 0..<len(board) {
             for y in 0..<len(board[0]){
-                rl.DrawRectangle(i32(400 + (x * 30)), i32(100 + (y * 30)), 30, 30, board[x][y])
+                rl.DrawRectangle(i32(300 + (x * 30)), i32(100 + (y * 30)), 30, 30, board[x][y])
             }
         }
 
-        if debugMode do rl.DrawFPS(0, 0)
+        if debugMode {
+            rl.DrawFPS(0, 0)
+            rl.DrawText(rl.TextFormat("%d, %d", currentShapeX, currentShapeY), 0, 30, 20, rl.WHITE)
+        }
 
         rl.EndDrawing()
     }
