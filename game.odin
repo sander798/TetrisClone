@@ -68,6 +68,20 @@ bigZedShape := Shape {
     tiles4 = {{0, 0, rl.DARKPURPLE, 0}, {rl.DARKPURPLE, rl.DARKPURPLE, rl.DARKPURPLE, 0}, {rl.DARKPURPLE, 0, 0, 0}, {0, 0, 0, 0}},
 }
 
+bigSquareShape := Shape {
+    tiles1 = {{rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {0, 0, 0, 0}},
+    tiles2 = {{rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {0, 0, 0, 0}},
+    tiles3 = {{rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {0, 0, 0, 0}},
+    tiles4 = {{rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {rl.YELLOW, rl.YELLOW, rl.YELLOW, 0}, {0, 0, 0, 0}},
+}
+
+rectangleShape := Shape {
+    tiles1 = {{rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE}, {rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE}, {0, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles2 = {{rl.SKYBLUE, rl.SKYBLUE, 0, 0}, {rl.SKYBLUE, rl.SKYBLUE, 0, 0}, {rl.SKYBLUE, rl.SKYBLUE, 0, 0}, {rl.SKYBLUE, rl.SKYBLUE, 0, 0}},
+    tiles3 = {{rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE}, {rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE, rl.SKYBLUE}, {0, 0, 0, 0}, {0, 0, 0, 0}},
+    tiles4 = {{rl.SKYBLUE, rl.SKYBLUE, 0, 0}, {rl.SKYBLUE, rl.SKYBLUE, 0, 0}, {rl.SKYBLUE, rl.SKYBLUE, 0, 0}, {rl.SKYBLUE, rl.SKYBLUE, 0, 0}},
+}
+
 shapes: []Shape = {lineShape, cornerRightShape, cornerLeftShape, squareShape, zedShape, bigZedShape}
 
 board: [10][20]rl.Color = {}    //Game board
@@ -87,6 +101,7 @@ rowsRemoved: u32                //Temporary count of rows removed in a scoring c
 score: u32
 level: u32 = 1
 gameOver := false
+ghostEnabled := true
 
 BASE_ROW_SCORE: u32 : 1
 BASE_LEVEL_SCORE: u32 : 10
@@ -276,6 +291,35 @@ rotateShape :: proc(clockwise: bool) -> bool {
     return true
 }
 
+//Returns how many rows down the current shape would travel before landing
+getGhostDropY :: proc() -> int {
+    drop := 0
+    savedColours: [16]rl.Color
+
+    //Temporarily remove the live shape from the board so it doesn't block itself
+    for p in 0..<currentShapeLength {
+        savedColours[p] = board[currentShapePoints[p].x][currentShapePoints[p].y]
+        board[currentShapePoints[p].x][currentShapePoints[p].y] = 0
+    }
+
+    outer: for {
+        for p in 0..<currentShapeLength {
+            newY := int(currentShapePoints[p].y) + drop + 1
+            if newY > 19 || board[currentShapePoints[p].x][newY] != 0 {
+                break outer
+            }
+        }
+        drop += 1
+    }
+
+    //Restore the live shape
+    for p in 0..<currentShapeLength {
+        board[currentShapePoints[p].x][currentShapePoints[p].y] = savedColours[p]
+    }
+
+    return drop
+}
+
 main :: proc() {
     context.logger = log.create_console_logger()
     defer log.destroy_console_logger(context.logger)
@@ -314,6 +358,10 @@ main :: proc() {
             
             if rl.IsKeyPressed(rl.KeyboardKey.LEFT_SHIFT) { //Rotate shape
                 rotateShape(true)
+            }
+
+            if rl.IsKeyPressed(rl.KeyboardKey.TAB) { //Toggle ghost preview
+                ghostEnabled = !ghostEnabled
             }
 
             //Check for downward movement
@@ -372,6 +420,18 @@ main :: proc() {
             for x in 0..<len(nextUpShapes[s].tiles1) {
                 for y in 0..<len(nextUpShapes[s].tiles1[0]){
                     rl.DrawRectangle(i32(414 - (s * 100) + (x * 20)), i32(8 + (y * 20)), 20, 20, nextUpShapes[s].tiles1[x][y])
+                }
+            }
+        }
+
+        //Ghost piece preview
+        if !gameOver && ghostEnabled {
+            ghostDrop := getGhostDropY()
+            if ghostDrop > 0 {
+                for p in 0..<currentShapeLength {
+                    ghostX := int(currentShapePoints[p].x)
+                    ghostY := int(currentShapePoints[p].y) + ghostDrop
+                    rl.DrawRectangle(i32(300 + (ghostX * 30)), i32(100 + (ghostY * 30)), 30, 30, rl.GRAY)
                 }
             }
         }
